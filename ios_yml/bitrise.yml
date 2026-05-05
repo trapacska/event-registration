@@ -50,8 +50,8 @@ workflows:
             CODE_SIGN_IDENTITY=""
             CODE_SIGNING_REQUIRED=NO
             CODE_SIGNING_ALLOWED=NO
-        - project_path: ios/EventRegistration.xcworkspace
-        - scheme: EventRegistration
+        - project_path: ios/Chess.xcworkspace
+        - scheme: Chess
     - deploy-to-bitrise-io@2: {}
     triggers:
       push: []
@@ -110,8 +110,8 @@ workflows:
             sudo security delete-certificate -c 'Apple Development: Tooling Bot Bitrise'
     - xcode-archive@6:
         inputs:
-        - project_path: ios/EventRegistration.xcworkspace
-        - scheme: EventRegistration
+        - project_path: ios/Chess.xcworkspace
+        - scheme: Chess
         - configuration: Release
         - verbose_log: 'yes'
         - distribution_method: enterprise
