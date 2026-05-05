@@ -1,98 +1,119 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
+import { ChessBoard } from '@/components/chess-board';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
+import { GLYPHS, GameState, initialGameState } from '@/lib/chess';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+export default function PlayScreen() {
+  const [game, setGame] = useState<GameState>(initialGameState);
+  const theme = useTheme();
+  const insets = useSafeAreaInsets();
 
-export default function HomeScreen() {
+  const capturedByWhite = game.capturedByWhite.map(p => GLYPHS[p.color][p.type]).join('');
+  const capturedByBlack = game.capturedByBlack.map(p => GLYPHS[p.color][p.type]).join('');
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
+    <ScrollView
+      style={[styles.scroll, { backgroundColor: theme.background }]}
+      contentContainerStyle={[
+        styles.content,
+        {
+          paddingTop: insets.top + Spacing.three,
+          paddingBottom: insets.bottom + BottomTabInset + Spacing.three,
+        },
+      ]}>
+      <ThemedView style={styles.inner}>
+        <ThemedText type="subtitle" style={styles.title}>
+          Chess
+        </ThemedText>
+
+        <ThemedView type="backgroundElement" style={styles.infoRow}>
+          <ThemedText type="smallBold" style={styles.sideLabel}>
+            {game.turn === 'black' ? '▶ Black' : '  Black'}
+          </ThemedText>
+          <ThemedText style={styles.captured} themeColor="textSecondary">
+            {capturedByBlack || '·'}
           </ThemedText>
         </ThemedView>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+        <ChessBoard state={game} onStateChange={setGame} />
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
+        <ThemedView type="backgroundElement" style={styles.infoRow}>
+          <ThemedText type="smallBold" style={styles.sideLabel}>
+            {game.turn === 'white' ? '▶ White' : '  White'}
+          </ThemedText>
+          <ThemedText style={styles.captured} themeColor="textSecondary">
+            {capturedByWhite || '·'}
+          </ThemedText>
         </ThemedView>
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+        <ThemedText type="small" themeColor="textSecondary" style={styles.lastMove}>
+          {game.lastMove ?? 'White to move'}
+        </ThemedText>
+
+        <Pressable
+          onPress={() => setGame(initialGameState())}
+          style={({ pressed }) => pressed && styles.pressed}>
+          <ThemedView type="backgroundElement" style={styles.button}>
+            <ThemedText type="smallBold">New Game</ThemedText>
+          </ThemedView>
+        </Pressable>
+      </ThemedView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scroll: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
   },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
+  content: {
     alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
+  },
+  inner: {
+    width: '100%',
     maxWidth: MaxContentWidth,
-  },
-  heroSection: {
     alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+    gap: Spacing.two,
+    paddingHorizontal: Spacing.three,
   },
   title: {
-    textAlign: 'center',
+    marginBottom: Spacing.one,
   },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+    paddingVertical: Spacing.one,
+    borderRadius: Spacing.two,
+    width: '100%',
+    maxWidth: 480,
+    gap: Spacing.two,
+  },
+  sideLabel: {
+    width: 68,
+  },
+  captured: {
+    flex: 1,
+    fontSize: 16,
+    letterSpacing: 1,
+  },
+  lastMove: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: Spacing.one,
+  },
+  pressed: {
+    opacity: 0.7,
+  },
+  button: {
+    paddingHorizontal: Spacing.five,
+    paddingVertical: Spacing.two,
+    borderRadius: Spacing.three,
+    marginTop: Spacing.one,
   },
 });
