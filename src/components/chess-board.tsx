@@ -8,12 +8,8 @@ import {
 } from 'react-native';
 
 import { Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 import { applyMove, GameState, getLegalMoves, GLYPHS, Position, posEqual } from '@/lib/chess';
-
-const LIGHT_SQ = '#f0d9b5';
-const DARK_SQ = '#b58863';
-const SEL_COLOR = 'rgba(255, 230, 0, 0.55)';
-const MOVE_COLOR = 'rgba(255, 230, 0, 0.30)';
 
 interface Props {
   state: GameState;
@@ -22,6 +18,7 @@ interface Props {
 
 export function ChessBoard({ state, onStateChange }: Props) {
   const { width } = useWindowDimensions();
+  const theme = useTheme();
   const sqSize = Math.floor(Math.min(width - Spacing.three * 2, 480) / 8);
   const boardSize = sqSize * 8;
   const pieceSize = Math.floor(sqSize * 0.68);
@@ -66,23 +63,21 @@ export function ChessBoard({ state, onStateChange }: Props) {
                 key={ci}
                 style={[
                   styles.sq,
-                  { width: sqSize, height: sqSize, backgroundColor: isLight ? LIGHT_SQ : DARK_SQ },
+                  { width: sqSize, height: sqSize, backgroundColor: isLight ? theme.boardLight : theme.boardDark },
                 ]}
                 onPress={() => handlePress(pos)}>
-                {isSel && <View style={[StyleSheet.absoluteFill, { backgroundColor: SEL_COLOR }]} />}
+                {isSel && <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.boardSelected }]} />}
                 {isTarget && (
-                  <View style={[StyleSheet.absoluteFill, { backgroundColor: MOVE_COLOR }]} />
+                  <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.boardLegal }]} />
                 )}
                 {isTarget && piece === null && (
                   <View
-                    style={[
-                      styles.dot,
-                      {
-                        width: sqSize * 0.3,
-                        height: sqSize * 0.3,
-                        borderRadius: (sqSize * 0.3) / 2,
-                      },
-                    ]}
+                    style={{
+                      width: sqSize * 0.3,
+                      height: sqSize * 0.3,
+                      borderRadius: (sqSize * 0.3) / 2,
+                      backgroundColor: theme.boardLegal,
+                    }}
                   />
                 )}
                 {piece !== null && (
@@ -121,9 +116,6 @@ const styles = StyleSheet.create({
   sq: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  dot: {
-    backgroundColor: 'rgba(0, 0, 0, 0.22)',
   },
   piece: {
     textAlign: 'center',

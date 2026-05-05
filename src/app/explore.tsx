@@ -74,9 +74,12 @@ export default function RulesScreen() {
 
         <ThemedView style={styles.rulesContainer}>
           {RULES.map(rule => (
-            <ThemedView key={rule.name} type="backgroundElement" style={styles.ruleCard}>
+            <ThemedView
+              key={rule.name}
+              type="backgroundElement"
+              style={[styles.ruleCard, { borderWidth: 1, borderColor: theme.border }]}>
               <ThemedView style={styles.ruleHeader} type="backgroundElement">
-                <ThemedText style={styles.glyph}>{rule.glyph}</ThemedText>
+                <ThemedText style={[styles.glyph, { color: theme.primary }]}>{rule.glyph}</ThemedText>
                 <ThemedText type="smallBold">{rule.name}</ThemedText>
               </ThemedView>
               <ThemedText type="small" themeColor="textSecondary">
@@ -85,7 +88,9 @@ export default function RulesScreen() {
             </ThemedView>
           ))}
 
-          <ThemedView type="backgroundElement" style={styles.ruleCard}>
+          <ThemedView
+            type="backgroundElement"
+            style={[styles.ruleCard, { borderWidth: 1, borderColor: theme.border }]}>
             <ThemedText type="smallBold" style={styles.generalTitle}>
               General
             </ThemedText>

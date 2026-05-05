@@ -59,8 +59,8 @@ export default function PlayScreen() {
         <Pressable
           onPress={() => setGame(initialGameState())}
           style={({ pressed }) => pressed && styles.pressed}>
-          <ThemedView type="backgroundElement" style={styles.button}>
-            <ThemedText type="smallBold">New Game</ThemedText>
+          <ThemedView type="primary" style={styles.button}>
+            <ThemedText type="smallBold" style={styles.buttonText}>New Game</ThemedText>
           </ThemedView>
         </Pressable>
       </ThemedView>
@@ -115,5 +115,8 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.two,
     borderRadius: Spacing.three,
     marginTop: Spacing.one,
+  },
+  buttonText: {
+    color: '#FFFFFF',
   },
 });
